@@ -1,6 +1,10 @@
-import { zaloOaService } from "../../core/services/zalo-oa";
-import { ApplicationError } from "../../core/types/strapi-utils";
-import { ZaloUserInfoRequestBody } from "../types/customer-func.request";
+// import { ZaloUserInfoRequestBody } from './../../customer-func/types/customer-func.request';
+/**
+ * test-controller service
+ */
+
+import { zaloOaService } from "../../../core/services/zalo-oa";
+import { ApplicationError } from "../../../core/types/strapi-utils";
 
 const messages = {
   locationInvalid: "Vị trí không nằm trong phạm vi cho phép",
@@ -14,7 +18,7 @@ const messages = {
 };
 
 export default () => ({
-  async getZaloUserInfo(data: ZaloUserInfoRequestBody) {
+  async getZaloUserInfo(data) {
     try {
       const res = await zaloOaService.getZaloUserInfo(
         data.userAccessToken,

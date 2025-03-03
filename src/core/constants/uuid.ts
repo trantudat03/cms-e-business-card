@@ -22,7 +22,7 @@ export enum EntityServiceUUID {
 export enum ServiceUUID {
   Webhook = "api::webhook.webhook",
   Integration = "api::integration.integration",
-  CustomerFunc = "api::customer-func.customer-func",
+  CustomerFunc = "api::func-customer.func-customer",
   LocationUtils = "api::location.utils",
   PromotionCodeQueue = "api::promotion-code.queue",
   AcquisitionQueue = "api::acquisition.queue",

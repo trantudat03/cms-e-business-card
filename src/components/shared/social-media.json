@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_social_medias",
+  "info": {
+    "displayName": "socialMedia",
+    "icon": "cloud"
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string"
+    },
+    "name": {
+      "type": "enumeration",
+      "enum": [
+        "zalo",
+        "facebook",
+        "telegram",
+        "tiktok",
+        "website"
+      ]
+    }
+  }
+}

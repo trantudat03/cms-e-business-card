@@ -4,7 +4,8 @@
   "info": {
     "singularName": "card",
     "pluralName": "cards",
-    "displayName": "Card"
+    "displayName": "Card",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
@@ -25,14 +26,37 @@
     "email": {
       "type": "string"
     },
-    "website": {
-      "type": "string"
-    },
     "contacts": {
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::contact.contact",
       "mappedBy": "card"
+    },
+    "user": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "plugin::users-permissions.user",
+      "mappedBy": "card"
+    },
+    "slogan": {
+      "type": "text"
+    },
+    "socialMedia": {
+      "displayName": "socialMedia",
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.social-media"
+    },
+    "avatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
     }
   }
 }

@@ -9,7 +9,7 @@
     "displayName": "User"
   },
   "options": {
-    "timestamps": true
+    "draftAndPublish": false
   },
   "attributes": {
     "username": {
@@ -70,6 +70,30 @@
       "relation": "oneToMany",
       "target": "api::contact.contact",
       "mappedBy": "users_permissions_user"
+    },
+    "phoneNumber": {
+      "type": "string"
+    },
+    "ZaloIdByApp": {
+      "type": "string"
+    },
+    "HasLoggedInBefore": {
+      "type": "boolean"
+    },
+    "LastInteractiveDate": {
+      "type": "datetime"
+    },
+    "ZaloIdByOA": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "card": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::card.card",
+      "inversedBy": "user"
     }
   }
 }

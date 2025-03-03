@@ -1,12 +1,15 @@
-import { ServiceUUID } from "../../core/constants/uuid";
-import { ApplicationError } from "../../core/types/strapi-utils";
+/**
+ * A set of functions called "actions" for `test-controller`
+ */
+import { ServiceUUID } from "../../../core/constants/uuid";
+import { ApplicationError } from "../../../core/types/strapi-utils";
 import { Context } from "koa";
 
-const controller = {
+export default {
   getZaloUserInfo: async (ctx: Context) => {
     try {
       const data = await strapi
-        .service(ServiceUUID.CustomerFunc)
+        .service("api::test-controller.test-controller")
         .getZaloUserInfo(ctx.request.body);
 
       ctx.body = { data };
@@ -19,5 +22,3 @@ const controller = {
     }
   },
 };
-
-export default controller;

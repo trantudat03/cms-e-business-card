@@ -62,6 +62,20 @@ export interface SharedSlider extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedSocialMedia extends Struct.ComponentSchema {
+  collectionName: 'components_shared_social_medias';
+  info: {
+    displayName: 'socialMedia';
+    icon: 'cloud';
+  };
+  attributes: {
+    name: Schema.Attribute.Enumeration<
+      ['zalo', 'facebook', 'telegram', 'tiktok', 'website']
+    >;
+    url: Schema.Attribute.String;
+  };
+}
+
 declare module '@strapi/strapi' {
   export module Public {
     export interface ComponentSchemas {
@@ -70,6 +84,7 @@ declare module '@strapi/strapi' {
       'shared.rich-text': SharedRichText;
       'shared.seo': SharedSeo;
       'shared.slider': SharedSlider;
+      'shared.social-media': SharedSocialMedia;
     }
   }
 }

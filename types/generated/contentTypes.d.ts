@@ -401,6 +401,7 @@ export interface ApiAboutAbout extends Struct.SingleTypeSchema {
 export interface ApiCardCard extends Struct.CollectionTypeSchema {
   collectionName: 'cards';
   info: {
+    description: '';
     displayName: 'Card';
     pluralName: 'cards';
     singularName: 'card';
@@ -409,6 +410,7 @@ export interface ApiCardCard extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    avatar: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     company: Schema.Attribute.String;
     contacts: Schema.Attribute.Relation<'oneToMany', 'api::contact.contact'>;
     createdAt: Schema.Attribute.DateTime;
@@ -422,10 +424,15 @@ export interface ApiCardCard extends Struct.CollectionTypeSchema {
     phone: Schema.Attribute.String;
     position: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
+    slogan: Schema.Attribute.Text;
+    socialMedia: Schema.Attribute.Component<'shared.social-media', true>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    website: Schema.Attribute.String;
+    user: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -948,10 +955,10 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    card: Schema.Attribute.Relation<'oneToOne', 'api::card.card'>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     contacts: Schema.Attribute.Relation<'oneToMany', 'api::contact.contact'>;
@@ -963,17 +970,21 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    HasLoggedInBefore: Schema.Attribute.Boolean;
+    LastInteractiveDate: Schema.Attribute.DateTime;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    name: Schema.Attribute.String;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    phoneNumber: Schema.Attribute.String;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
@@ -990,6 +1001,8 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
+    ZaloIdByApp: Schema.Attribute.String;
+    ZaloIdByOA: Schema.Attribute.String;
   };
 }
 

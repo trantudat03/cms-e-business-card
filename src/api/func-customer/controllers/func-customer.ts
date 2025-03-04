@@ -58,7 +58,6 @@ export default {
 
   getContactByUserId: async (ctx) => {
     try {
-      console.log("chay vao day", ctx);
       const data = await strapi
         .service("api::func-customer.func-customer")
         .getContactByUserId(ctx.state.user.id);
@@ -73,10 +72,8 @@ export default {
 
   getActionCard: async (ctx) => {
     try {
-      console.log("chay vao day");
-
       const body = ctx.request.body;
-      console.log(body);
+
       const data = await strapi
         .service("api::func-customer.func-customer")
         .getActionCard(ctx.state?.user?.id, body.data);

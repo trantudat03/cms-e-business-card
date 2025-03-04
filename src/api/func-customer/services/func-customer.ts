@@ -1,7 +1,7 @@
 import { log } from "console";
 import { ENV_CONFIG } from "../../../core/constants/config";
 import { UtilsHelper } from "../../../core/helper/utils";
-import { zaloOaService } from "../../../core/services/zalo-oa";
+// import { zaloOaService } from "../../../core/services/zalo-oa";
 import { UserJoinFrom, UserRoleId } from "../../../core/types/entity/user";
 import { ApplicationError } from "../../../core/types/strapi-utils";
 import {
@@ -26,24 +26,25 @@ const messages = {
 };
 
 export default () => ({
-  async getZaloUserInfo(data) {
-    try {
-      const res = await zaloOaService.getZaloUserInfo(
-        data.userAccessToken,
-        data.token,
-        data.locationCode
-      );
+  //   async getZaloUserInfo(data) {
+  //     try {
+  //       const res = await zaloOaService.getZaloUserInfo(
+  //         data.userAccessToken,
+  //         data.token,
+  //         data.locationCode
+  //       );
 
-      return res;
-    } catch (error: any) {
-      throw new ApplicationError(messages.default, {
-        error: error?.error,
-        message: error?.message,
-      });
-    }
-  },
+  //       return res;
+  //     } catch (error: any) {
+  //       throw new ApplicationError(messages.default, {
+  //         error: error?.error,
+  //         message: error?.message,
+  //       });
+  //     }
+  //   },
   async authUserWithZalo(data: AuthUserRequestBody) {
     try {
+      console.log("data", data);
       let phoneNumber = data?.phoneNumber;
       let res: {
         id?: string;
@@ -59,14 +60,14 @@ export default () => ({
       let userByZaloId: any | undefined = undefined;
       let card: any | undefined = undefined;
       let hasLoggedInBefore = false;
-      if (data.phoneNumberToken) {
-        const res = await zaloOaService.getZaloUserInfo(
-          data.zaloAccessToken,
-          data.phoneNumberToken,
-          data.zaloName
-        );
-        phoneNumber = res.data.number;
-      }
+      //   if (data.phoneNumberToken) {
+      //     const res = await zaloOaService.getZaloUserInfo(
+      //       data.zaloAccessToken,
+      //       data.phoneNumberToken,
+      //       data.zaloName
+      //     );
+      //     phoneNumber = res.data.number;
+      //   }
 
       if (data.zaloIdByApp) {
         const [firstUser] = await strapi

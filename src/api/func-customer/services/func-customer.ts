@@ -44,7 +44,6 @@ export default () => ({
   //   },
   async authUserWithZalo(data: AuthUserRequestBody) {
     try {
-      console.log("data", data);
       let phoneNumber = data?.phoneNumber;
       let res: {
         id?: string;
@@ -100,8 +99,6 @@ export default () => ({
       }
 
       if (user) {
-        //   hasLoggedInBefore = !!user.HasLoggedInBefore;
-
         await strapi.documents("plugin::users-permissions.user").update({
           documentId: user.documentId,
           data: {
@@ -162,14 +159,14 @@ export default () => ({
           .service("jwt")
           .issue(
             tokenPayload,
-            data.testExpireToken ? { expiresIn: "10s" } : undefined
+            data.testExpireToken ? { expiresIn: "1h" } : undefined
           ),
         refreshToken: JwtHelper.issueRefreshToken(tokenPayload, {
           expiresIn: "30d",
         }),
         hasLoggedInBefore,
         user: {
-          id: user.id,
+          id: user.documentId,
           ZaloIdByApp: user.ZaloIdByApp,
           phoneNumber: user.phoneNumber,
           username: user.username,
@@ -216,6 +213,7 @@ export default () => ({
             socialMedia: data.socialMedia,
             position: data.position,
           },
+          populate: ["socialMedia"],
         });
       }
       return card;
@@ -240,20 +238,7 @@ export default () => ({
           // Kiểm tra nếu userId là chủ sở hữu card
           if (firstCard.user?.id === userId) {
             action = "own";
-          }
-          // Kiểm tra nếu userId đã có contact với đúng card này
-          else {
-            // const contact = await strapi.entityService.findMany(
-            //   "api::contact.contact",
-            //   {
-            //     filters: {
-            //       users_permissions_user: { id: userId }, // 🔹 Sửa lỗi truyền userId
-            //       card: { id: cardId }, // 🔹 Sửa lỗi truyền cardId
-            //     },
-            //     limit: 1,
-            //   }
-            // );
-
+          } else {
             const [contact] = await strapi
               .documents("api::contact.contact")
               .findMany({
@@ -263,12 +248,14 @@ export default () => ({
                 },
                 limit: 1,
               });
+
             if (contact) {
               action = "contact";
+              card = { ...firstCard, contactId: contact.documentId };
             }
           }
 
-          card = { ...firstCard, action };
+          card = { ...card, action };
         }
       }
       return card;
@@ -277,21 +264,29 @@ export default () => ({
     }
   },
 
-  async getContactByUserId(userId: number) {
+  async getContactByUserId(userId, page, pageSize, searchTerm = "") {
     try {
-      if (!userId) {
-        return null; // Trả về null nếu không có userId
+      if (!userId) return null; // Trả về null nếu không có userId
+      const filters: any = {
+        users_permissions_user: { id: userId },
+      };
+
+      // Nếu có searchTerm, áp dụng lọc theo tên công ty, vị trí hoặc tên người dùng
+      if (searchTerm) {
+        filters.$or = [
+          { card: { company: { $containsi: searchTerm } } },
+          { card: { position: { $containsi: searchTerm } } },
+          { card: { name: { $containsi: searchTerm } } },
+        ];
       }
 
       const contacts = await strapi.entityService.findMany(
         "api::contact.contact",
         {
-          filters: {
-            users_permissions_user: { id: userId },
-          },
+          filters,
           populate: {
             card: {
-              fields: ["id", "company", "position", "name"], // Lấy thông tin cần thiết từ card
+              fields: ["id", "company", "position", "name"],
               populate: {
                 user: {
                   fields: [
@@ -300,19 +295,37 @@ export default () => ({
                     "email",
                     "phoneNumber",
                     "ZaloIdByApp",
-                  ], // Lấy thông tin User từ card
+                  ],
                 },
                 avatar: true,
               },
             },
           },
+          limit: Number(pageSize), // Giới hạn số bản ghi mỗi trang
+          offset: (Number(page) - 1) * Number(pageSize),
         }
       );
 
+      //   strapi.documents(uid).count();
+
+      const total = await strapi.documents("api::contact.contact").count({
+        filters,
+      });
+      const [data] = contacts;
+      console.log(data);
+      return {
+        data: contacts,
+        pagination: {
+          page: Number(page),
+          pageSize: Number(pageSize),
+          pageCount: Math.ceil(total / Number(pageSize)),
+          total: total,
+        },
+      };
       return contacts;
     } catch (error) {
       console.error("Error fetching contacts:", error);
-      throw new Error("Unable to fetch contacts"); // Trả về lỗi thay vì lỗi thô
+      throw new Error("Unable to fetch contacts");
     }
   },
 });

@@ -58,9 +58,15 @@ export default {
 
   getContactByUserId: async (ctx) => {
     try {
+      console.log(ctx.query);
       const data = await strapi
         .service("api::func-customer.func-customer")
-        .getContactByUserId(ctx.state.user.id);
+        .getContactByUserId(
+          ctx.state.user.id,
+          ctx.query.page,
+          ctx.query.pageSize,
+          ctx.query.searchTerm
+        );
 
       ctx.body = { data };
     } catch (err: any) {

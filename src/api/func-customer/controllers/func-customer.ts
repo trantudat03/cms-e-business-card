@@ -5,6 +5,21 @@ import {
 import { Context } from "koa";
 import { authUserSchema } from "../validation/schema";
 export default {
+  testApi: async (ctx: Context) => {
+    try {
+      //   const data = await strapi
+      //     .service("api::func-customer.func-customer")
+      //     .getZaloUserInfo(ctx.request.body);
+
+      ctx.body = { data: "call api success!" };
+    } catch (err: any) {
+      strapi.log.error(
+        `[getZaloUserInfo] ${err?.message} body: ${JSON.stringify(ctx.request.body || {})}`
+      );
+      if (err instanceof ApplicationError) return Promise.reject(err);
+      return Promise.reject(new ApplicationError(err?.message));
+    }
+  },
   getZaloUserInfoC: async (ctx: Context) => {
     try {
       const data = await strapi

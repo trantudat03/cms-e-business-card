@@ -94,6 +94,12 @@
       "relation": "oneToOne",
       "target": "api::card.card",
       "inversedBy": "user"
+    },
+    "theme_cards": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::theme-card.theme-card",
+      "mappedBy": "user"
     }
   }
 }

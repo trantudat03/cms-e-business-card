@@ -424,6 +424,10 @@ export interface ApiAppSettingAppSetting extends Struct.SingleTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    themes_default: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::theme-card.theme-card'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -458,6 +462,7 @@ export interface ApiCardCard extends Struct.CollectionTypeSchema {
     publishedAt: Schema.Attribute.DateTime;
     slogan: Schema.Attribute.Text;
     socialMedia: Schema.Attribute.Component<'shared.social-media', true>;
+    themeID: Schema.Attribute.Text;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -529,6 +534,48 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiThemeCardThemeCard extends Struct.CollectionTypeSchema {
+  collectionName: 'theme_cards';
+  info: {
+    displayName: 'ThemeCard';
+    pluralName: 'theme-cards';
+    singularName: 'theme-card';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    background: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.Text;
+    layout: Schema.Attribute.Enumeration<['columns', 'rows']>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::theme-card.theme-card'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String;
+    price: Schema.Attribute.BigInteger;
+    publishedAt: Schema.Attribute.DateTime;
+    statusThemes: Schema.Attribute.Enumeration<
+      ['Active', 'Maintenance', 'Deprecated']
+    >;
+    textColor: Schema.Attribute.Enumeration<['white', 'black']>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1024,6 +1071,10 @@ export interface PluginUsersPermissionsUser
       'manyToOne',
       'plugin::users-permissions.role'
     >;
+    theme_cards: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::theme-card.theme-card'
+    >;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1053,6 +1104,7 @@ declare module '@strapi/strapi' {
       'api::card.card': ApiCardCard;
       'api::contact.contact': ApiContactContact;
       'api::global.global': ApiGlobalGlobal;
+      'api::theme-card.theme-card': ApiThemeCardThemeCard;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

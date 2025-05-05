@@ -75,6 +75,13 @@ export default () => ({
             filters: {
               ZaloIdByApp: data.zaloIdByApp,
             },
+            populate: {
+              theme_cards: {
+                populate: {
+                  background: true,
+                },
+              },
+            },
             limit: 1,
           });
 
@@ -90,7 +97,13 @@ export default () => ({
             filters: {
               phoneNumber: phoneNumber,
             },
-
+            populate: {
+              theme_cards: {
+                populate: {
+                  background: true,
+                },
+              },
+            },
             limit: 1,
           });
 
@@ -102,7 +115,7 @@ export default () => ({
         await strapi.documents("plugin::users-permissions.user").update({
           documentId: user.documentId,
           data: {
-            HasLoggedInBefore: user.HasLoggedInBefore ? undefined : true,
+            HasLoggedInBefore: true,
             LastInteractiveDate: new Date().toISOString(),
           },
         });
@@ -114,6 +127,18 @@ export default () => ({
           limit: 1,
         });
         card = firstCard;
+      }
+
+      if (card) {
+        const themeCard = await strapi
+          .documents("api::theme-card.theme-card")
+          .findOne({
+            documentId: card?.themeID,
+            populate: {
+              background: true,
+            },
+          });
+        card.theme = themeCard || null;
       }
 
       if (!userByZaloId) {
@@ -172,6 +197,7 @@ export default () => ({
           username: user.username,
           name: user.name,
           JoinDate: user.JoinDate,
+          theme_cards: user.theme_cards,
         },
         card: card,
       };
@@ -200,7 +226,7 @@ export default () => ({
 
   async updateCard(userId: number, data: UpdateCardRequestBody) {
     try {
-      let card = {};
+      let card: any | undefined = undefined;
       if (userId) {
         card = await strapi.documents("api::card.card").update({
           documentId: data.documentId,
@@ -212,9 +238,21 @@ export default () => ({
             slogan: data.slogan,
             socialMedia: data.socialMedia,
             position: data.position,
+            themeID: data.themeID,
           },
           populate: ["socialMedia"],
         });
+      }
+      if (card) {
+        const themeCard = await strapi
+          .documents("api::theme-card.theme-card")
+          .findOne({
+            documentId: card?.themeID,
+            populate: {
+              background: true,
+            },
+          });
+        card.theme = themeCard || null;
       }
       return card;
     } catch (error) {
@@ -223,7 +261,7 @@ export default () => ({
   },
   async getActionCard(userId: number, cardId: string) {
     try {
-      let card = {};
+      let card: any | undefined = undefined;
       let action = "none";
       if (userId) {
         const [firstCard] = await strapi.documents("api::card.card").findMany({
@@ -254,8 +292,18 @@ export default () => ({
               card = { ...firstCard, contactId: contact.documentId };
             }
           }
-
-          card = { ...card, action };
+          card.action = action;
+          if (firstCard) {
+            const themeCard = await strapi
+              .documents("api::theme-card.theme-card")
+              .findOne({
+                documentId: card?.themeID,
+                populate: {
+                  background: true,
+                },
+              });
+            card.theme = themeCard || null;
+          }
         }
       }
       return card;

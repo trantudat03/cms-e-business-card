@@ -24,6 +24,11 @@
     },
     "appName": {
       "type": "string"
+    },
+    "themes_default": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::theme-card.theme-card"
     }
   }
 }

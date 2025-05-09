@@ -26,4 +26,6 @@ export type UpdateCardRequestBody = {
   email: string;
   changeAvatar?: boolean;
   useZaloAvatar?: boolean;
+  themeID: string;
+  avatar: string;
 };

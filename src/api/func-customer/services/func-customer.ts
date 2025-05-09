@@ -1,7 +1,7 @@
 import { log } from "console";
 import { ENV_CONFIG } from "../../../core/constants/config";
 import { UtilsHelper } from "../../../core/helper/utils";
-import { zaloOaService } from "../../../core/services/zalo-oa";
+// import { zaloOaService } from "../../../core/services/zalo-oa";
 import { UserJoinFrom, UserRoleId } from "../../../core/types/entity/user";
 import { ApplicationError } from "../../../core/types/strapi-utils";
 import {
@@ -26,22 +26,22 @@ const messages = {
 };
 
 export default () => ({
-  async getZaloUserInfo(data) {
-    try {
-      const res = await zaloOaService.getZaloUserInfo(
-        data.userAccessToken,
-        data.token,
-        data.locationCode
-      );
+  //   async getZaloUserInfo(data) {
+  //     try {
+  //       const res = await zaloOaService.getZaloUserInfo(
+  //         data.userAccessToken,
+  //         data.token,
+  //         data.locationCode
+  //       );
 
-      return res;
-    } catch (error: any) {
-      throw new ApplicationError(messages.default, {
-        error: error?.error,
-        message: error?.message,
-      });
-    }
-  },
+  //       return res;
+  //     } catch (error: any) {
+  //       throw new ApplicationError(messages.default, {
+  //         error: error?.error,
+  //         message: error?.message,
+  //       });
+  //     }
+  //   },
   async authUserWithZalo(data: AuthUserRequestBody) {
     try {
       let phoneNumber = data?.phoneNumber;
@@ -59,14 +59,14 @@ export default () => ({
       let userByZaloId: any | undefined = undefined;
       let card: any | undefined = undefined;
       let hasLoggedInBefore = false;
-      if (data.phoneNumberToken) {
-        const res = await zaloOaService.getZaloUserInfo(
-          data.zaloAccessToken,
-          data.phoneNumberToken,
-          data.zaloName
-        );
-        phoneNumber = res.data.number;
-      }
+      //   if (data.phoneNumberToken) {
+      //     const res = await zaloOaService.getZaloUserInfo(
+      //       data.zaloAccessToken,
+      //       data.phoneNumberToken,
+      //       data.zaloName
+      //     );
+      //     phoneNumber = res.data.number;
+      //   }
 
       if (data.zaloIdByApp) {
         const [firstUser] = await strapi
@@ -74,6 +74,13 @@ export default () => ({
           .findMany({
             filters: {
               ZaloIdByApp: data.zaloIdByApp,
+            },
+            populate: {
+              theme_cards: {
+                populate: {
+                  background: true,
+                },
+              },
             },
             limit: 1,
           });
@@ -90,7 +97,13 @@ export default () => ({
             filters: {
               phoneNumber: phoneNumber,
             },
-
+            populate: {
+              theme_cards: {
+                populate: {
+                  background: true,
+                },
+              },
+            },
             limit: 1,
           });
 
@@ -99,12 +112,10 @@ export default () => ({
       }
 
       if (user) {
-        //   hasLoggedInBefore = !!user.HasLoggedInBefore;
-
         await strapi.documents("plugin::users-permissions.user").update({
           documentId: user.documentId,
           data: {
-            HasLoggedInBefore: user.HasLoggedInBefore ? undefined : true,
+            HasLoggedInBefore: true,
             LastInteractiveDate: new Date().toISOString(),
           },
         });
@@ -116,6 +127,18 @@ export default () => ({
           limit: 1,
         });
         card = firstCard;
+      }
+
+      if (card) {
+        const themeCard = await strapi
+          .documents("api::theme-card.theme-card")
+          .findOne({
+            documentId: card?.themeID,
+            populate: {
+              background: true,
+            },
+          });
+        card.theme = themeCard || null;
       }
 
       if (!userByZaloId) {
@@ -161,19 +184,20 @@ export default () => ({
           .service("jwt")
           .issue(
             tokenPayload,
-            data.testExpireToken ? { expiresIn: "10s" } : undefined
+            data.testExpireToken ? { expiresIn: "1h" } : undefined
           ),
         refreshToken: JwtHelper.issueRefreshToken(tokenPayload, {
           expiresIn: "30d",
         }),
         hasLoggedInBefore,
         user: {
-          id: user.id,
+          id: user.documentId,
           ZaloIdByApp: user.ZaloIdByApp,
           phoneNumber: user.phoneNumber,
           username: user.username,
           name: user.name,
           JoinDate: user.JoinDate,
+          theme_cards: user.theme_cards,
         },
         card: card,
       };
@@ -202,7 +226,7 @@ export default () => ({
 
   async updateCard(userId: number, data: UpdateCardRequestBody) {
     try {
-      let card = {};
+      let card: any | undefined = undefined;
       if (userId) {
         card = await strapi.documents("api::card.card").update({
           documentId: data.documentId,
@@ -214,8 +238,21 @@ export default () => ({
             slogan: data.slogan,
             socialMedia: data.socialMedia,
             position: data.position,
+            themeID: data.themeID,
           },
+          populate: ["socialMedia"],
         });
+      }
+      if (card) {
+        const themeCard = await strapi
+          .documents("api::theme-card.theme-card")
+          .findOne({
+            documentId: card?.themeID,
+            populate: {
+              background: true,
+            },
+          });
+        card.theme = themeCard || null;
       }
       return card;
     } catch (error) {
@@ -224,7 +261,7 @@ export default () => ({
   },
   async getActionCard(userId: number, cardId: string) {
     try {
-      let card = {};
+      let card: any | undefined = undefined;
       let action = "none";
       if (userId) {
         const [firstCard] = await strapi.documents("api::card.card").findMany({
@@ -239,20 +276,7 @@ export default () => ({
           // Kiểm tra nếu userId là chủ sở hữu card
           if (firstCard.user?.id === userId) {
             action = "own";
-          }
-          // Kiểm tra nếu userId đã có contact với đúng card này
-          else {
-            // const contact = await strapi.entityService.findMany(
-            //   "api::contact.contact",
-            //   {
-            //     filters: {
-            //       users_permissions_user: { id: userId }, // 🔹 Sửa lỗi truyền userId
-            //       card: { id: cardId }, // 🔹 Sửa lỗi truyền cardId
-            //     },
-            //     limit: 1,
-            //   }
-            // );
-
+          } else {
             const [contact] = await strapi
               .documents("api::contact.contact")
               .findMany({
@@ -262,12 +286,24 @@ export default () => ({
                 },
                 limit: 1,
               });
+
             if (contact) {
               action = "contact";
+              card = { ...firstCard, contactId: contact.documentId };
             }
           }
-
-          card = { ...firstCard, action };
+          card.action = action;
+          if (firstCard) {
+            const themeCard = await strapi
+              .documents("api::theme-card.theme-card")
+              .findOne({
+                documentId: card?.themeID,
+                populate: {
+                  background: true,
+                },
+              });
+            card.theme = themeCard || null;
+          }
         }
       }
       return card;
@@ -276,21 +312,29 @@ export default () => ({
     }
   },
 
-  async getContactByUserId(userId: number) {
+  async getContactByUserId(userId, page, pageSize, searchTerm = "") {
     try {
-      if (!userId) {
-        return null; // Trả về null nếu không có userId
+      if (!userId) return null; // Trả về null nếu không có userId
+      const filters: any = {
+        users_permissions_user: { id: userId },
+      };
+
+      // Nếu có searchTerm, áp dụng lọc theo tên công ty, vị trí hoặc tên người dùng
+      if (searchTerm) {
+        filters.$or = [
+          { card: { company: { $containsi: searchTerm } } },
+          { card: { position: { $containsi: searchTerm } } },
+          { card: { name: { $containsi: searchTerm } } },
+        ];
       }
 
       const contacts = await strapi.entityService.findMany(
         "api::contact.contact",
         {
-          filters: {
-            users_permissions_user: { id: userId },
-          },
+          filters,
           populate: {
             card: {
-              fields: ["id", "company", "position", "name"], // Lấy thông tin cần thiết từ card
+              fields: ["id", "company", "position", "name"],
               populate: {
                 user: {
                   fields: [
@@ -299,19 +343,37 @@ export default () => ({
                     "email",
                     "phoneNumber",
                     "ZaloIdByApp",
-                  ], // Lấy thông tin User từ card
+                  ],
                 },
                 avatar: true,
               },
             },
           },
+          limit: Number(pageSize), // Giới hạn số bản ghi mỗi trang
+          offset: (Number(page) - 1) * Number(pageSize),
         }
       );
 
+      //   strapi.documents(uid).count();
+
+      const total = await strapi.documents("api::contact.contact").count({
+        filters,
+      });
+      const [data] = contacts;
+      console.log(data);
+      return {
+        data: contacts,
+        pagination: {
+          page: Number(page),
+          pageSize: Number(pageSize),
+          pageCount: Math.ceil(total / Number(pageSize)),
+          total: total,
+        },
+      };
       return contacts;
     } catch (error) {
       console.error("Error fetching contacts:", error);
-      throw new Error("Unable to fetch contacts"); // Trả về lỗi thay vì lỗi thô
+      throw new Error("Unable to fetch contacts");
     }
   },
 });

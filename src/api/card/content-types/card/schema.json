@@ -57,6 +57,9 @@
         "videos",
         "audios"
       ]
+    },
+    "themeID": {
+      "type": "text"
     }
   }
 }

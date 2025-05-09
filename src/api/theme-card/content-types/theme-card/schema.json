@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "theme_cards",
+  "info": {
+    "singularName": "theme-card",
+    "pluralName": "theme-cards",
+    "displayName": "ThemeCard"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text"
+    },
+    "background": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "layout": {
+      "type": "enumeration",
+      "enum": [
+        "columns",
+        "rows"
+      ]
+    },
+    "price": {
+      "type": "biginteger"
+    },
+    "statusThemes": {
+      "type": "enumeration",
+      "enum": [
+        "Active",
+        "Maintenance",
+        "Deprecated"
+      ]
+    },
+    "textColor": {
+      "type": "enumeration",
+      "enum": [
+        "white",
+        "black"
+      ]
+    },
+    "user": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "theme_cards"
+    }
+  }
+}

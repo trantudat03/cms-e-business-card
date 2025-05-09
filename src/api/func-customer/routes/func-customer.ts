@@ -10,6 +10,15 @@ export default {
       },
     },
     {
+      method: "GET",
+      path: "/func-customer/test-api",
+      handler: "func-customer.testApi",
+      config: {
+        policies: [],
+        middlewares: [],
+      },
+    },
+    {
       method: "POST",
       path: "/func-customer/auth",
       handler: "func-customer.auth",

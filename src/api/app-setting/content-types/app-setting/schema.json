@@ -1,0 +1,34 @@
+{
+  "kind": "singleType",
+  "collectionName": "app_settings",
+  "info": {
+    "singularName": "app-setting",
+    "pluralName": "app-settings",
+    "displayName": "AppSetting",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "defaultAvatar": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "appName": {
+      "type": "string"
+    },
+    "themes_default": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::theme-card.theme-card"
+    }
+  }
+}

@@ -1,12 +1,24 @@
 module.exports = ({ env }) => ({
   upload: {
+    // config: {
+    //   providerOptions: {
+    //     localServer: {
+    //       maxage: 300000, // Đặt thời gian cache tối đa là 5 phút
+    //     },
+    //   },
+    //   sizeLimit: 250 * 1024 * 1024, // Giới hạn kích thước tệp tối đa là 250MB
+    // },
     config: {
+      provider: "cloudinary",
       providerOptions: {
-        localServer: {
-          maxage: 300000, // Đặt thời gian cache tối đa là 5 phút
-        },
+        cloud_name: env("CLOUDINARY_NAME", "dtfrotdax"),
+        api_key: env("CLOUDINARY_KEY", "188385232158984"),
+        api_secret: env("CLOUDINARY_SECRET", "0olXK6wY7Ww7tNqXhseysNynROM"),
       },
-      sizeLimit: 250 * 1024 * 1024, // Giới hạn kích thước tệp tối đa là 250MB
+      actionOptions: {
+        upload: {},
+        delete: {},
+      },
     },
   },
   "users-permissions": {

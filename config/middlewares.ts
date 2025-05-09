@@ -4,7 +4,15 @@ export default [
   {
     name: "strapi::security",
     config: {
-      contentSecurityPolicy: false, // Tắt CSP để tránh lỗi CORS
+      contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+          "connect-src": ["'self'", "https:"],
+          "img-src": ["'self'", "data:", "blob:", "res.cloudinary.com"],
+          "media-src": ["'self'", "data:", "blob:", "res.cloudinary.com"],
+          upgradeInsecureRequests: null,
+        },
+      },
     },
   },
   {

@@ -29,6 +29,16 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::theme-card.theme-card"
+    },
+    "logo": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }

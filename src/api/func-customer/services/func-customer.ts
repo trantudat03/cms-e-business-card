@@ -241,7 +241,7 @@ export default () => ({
             themeID: data.themeID,
             // note
           },
-          populate: ["socialMedia"],
+          populate: ["socialMedia", "avatar"],
         });
       }
       if (card) {

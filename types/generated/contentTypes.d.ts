@@ -423,6 +423,7 @@ export interface ApiAppSettingAppSetting extends Struct.SingleTypeSchema {
       'api::app-setting.app-setting'
     > &
       Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     publishedAt: Schema.Attribute.DateTime;
     themes_default: Schema.Attribute.Relation<
       'oneToMany',

@@ -13,7 +13,7 @@ module.exports = ({ env }) => ({
       providerOptions: {
         cloud_name: env("CLOUDINARY_NAME", "dtfrotdax"),
         api_key: env("CLOUDINARY_KEY", "188385232158984"),
-        api_secret: env("CLOUDINARY_SECRET", "0olXK6wY7Ww7tNqXhseysNynROM"),
+        api_secret: env("CLOUDINARY_SECRET"),
       },
       actionOptions: {
         upload: {},

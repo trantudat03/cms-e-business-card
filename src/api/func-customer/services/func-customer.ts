@@ -239,6 +239,7 @@ export default () => ({
             socialMedia: data.socialMedia,
             position: data.position,
             themeID: data.themeID,
+            // note
           },
           populate: ["socialMedia"],
         });
